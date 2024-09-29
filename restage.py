@@ -181,7 +181,7 @@ def pack_dir(args):
         for stage in stage_list.readlines():
             stages.append(stage.strip())
 
-    outf = open(args.dir, "wb")
+    outf = open(args.out, "wb")
     buf = BufWriter(outf)
 
     header_size = len(stages) * 12
@@ -210,7 +210,7 @@ def pack_dir(args):
 
     outf.close()
 
-    print(f"successfully wrote {args.dir}!")
+    print(f"successfully wrote {args.out}!")
 
 def build_dictionary(file):
     table = {}
@@ -340,10 +340,10 @@ def unpack_stage(args, table, stage, buf):
                 buf.align(2048)
 
 def unpack_dir(args):
-    file = open(args.dir, "rb")
+    file = open(args.in, "rb")
     buf = BufReader(file)
 
-    file_size = os.path.getsize(args.dir)
+    file_size = os.path.getsize(args.in)
 
     header_size = buf.unpack("<I")
     assert((header_size % 12) == 0)
@@ -375,17 +375,20 @@ def unpack_dir(args):
 def parse_args():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-d", "--dir",
-                        help="dir file to use as input/output",
-                        default="STAGE2.DIR")
+    parser.add_argument("-i", "--in",
+                        help="dir file to unpack from",
+                        default="STAGE.DIR")
+
+    parser.add_argument("-o", "--out",
+                        help="dir file to pack to",
+                        default="NEW_STAGE.DIR")
 
     parser.add_argument("-s", "--stage",
                         help="stage file to unpack, otherwise unpack all")
 
     parser.add_argument("-p", "--pack",
                         help="pack a stage directory using stage_list.txt",
-                        action="store_true",
-                        default=True)
+                        action="store_true")
 
     parser.add_argument("-v", "--verbose",
                         help="enable verbose output",
